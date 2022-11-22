@@ -1,0 +1,12 @@
+{
+  "editor.detectIndentation": false,
+  "eslint.validate": ["javascript", "typescript"],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "workbench.tree.indent": 25,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always"
+}

@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug on Chrome",
+      "url": "http://localhost:3000/",
+      "webRoot": "${workspaceFolder}/src",
+      "preLaunchTask": "npm: dev",
+      "postDebugTask": "Terminate Task",
+      "smartStep": true,
+      "enableContentValidation": false,
+      "userDataDir": "${workspaceFolder}/.vscode/vscode-chrome-debug-userdatadir",
+      "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test and Watch Current File",
+      "runtimeArgs": ["run-script", "test", "${file}"],
+      "runtimeExecutable": "npm",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

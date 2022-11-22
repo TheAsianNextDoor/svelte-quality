@@ -1,0 +1,185 @@
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// model keys sort in ascending order
+// 1. id/Primary keys
+// 2. Foreign Keys
+// 3. unique/index keys
+// 4. any keys not including created_at or updated_at
+// 5. created_at and updated_at (if present)
+// 6. scalars
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model Organization {
+  id        String  @id @default(uuid())
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId String
+  name      String  @unique
+  User      User[]
+  Site      Site[]
+
+  @@index([name])
+}
+
+model Site {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  address        Address      @relation(fields: [addressId], references: [id])
+  addressId      String
+  name           String
+  User           User[]
+  Inspection     Inspection[]
+
+  @@index([organizationId])
+}
+
+model Address {
+  id           String         @id @default(uuid())
+  street       String
+  city         String
+  state        String
+  zip          String
+  Site         Site[]
+  Organization Organization[]
+
+  @@unique([street, city, state])
+}
+
+model User {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  site           Site         @relation(fields: [siteId], references: [id])
+  siteId         String
+  email          String       @unique
+  first          String
+  last           String
+  createdAt      DateTime     @default(now())
+  Permission     Permission?
+  Comment        Comment[]
+  Photo          Photo[]
+  Attachment     Attachment[]
+  Inspection     Inspection[]
+  Task           Task[]
+
+  @@index([email, organizationId])
+}
+
+model Permission {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  level     Int
+  createdAt DateTime @default(now())
+}
+
+enum InspectionStatus {
+  NOT_STARTED
+  PENDING
+  COMPLETED
+  SKIPPED
+}
+
+model Inspection {
+  id          String            @id @default(uuid())
+  owner       User              @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  site        Site              @relation(fields: [siteId], references: [id])
+  siteId      String
+  title       String
+  description String
+  status      InspectionStatus? @default(NOT_STARTED)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  Comment     Comment[]
+  Task        Task[]
+
+  @@index([title, ownerId])
+}
+
+enum TaskStatus {
+  PASSED
+  ACCEPTABLE
+  FAILED
+  SKIPPED
+}
+
+model Task {
+  id           String       @id @default(uuid())
+  inspection   Inspection   @relation(fields: [inspectionId], references: [id])
+  inspectionId String
+  user         User         @relation(fields: [completedBy], references: [id])
+  completedBy  String
+  title        String
+  description  String
+  status       TaskStatus?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  Links        TaskLinks[]
+  Comment      Comment[]
+  Photo        Photo[]
+  Attachment   Attachment[]
+
+  @@index([title, inspectionId, completedBy])
+}
+
+model TaskLinks {
+  id        String   @id @default(uuid())
+  info      String
+  link      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Task      Task[]
+}
+
+model Comment {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  task         Task       @relation(fields: [taskId], references: [id])
+  taskId       String
+  inspection   Inspection @relation(fields: [inspectionId], references: [id])
+  inspectionId String
+  message      String
+  parentId     String?
+  createdAt    DateTime   @default(now())
+
+  @@index([userId, taskId])
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    String
+  mimeType  String
+  image     Bytes
+  createdAt DateTime @default(now())
+
+  @@index([userId, taskId])
+}
+
+model Attachment {
+  id       String @id @default(uuid())
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  task     Task   @relation(fields: [taskId], references: [id])
+  taskId   String
+  mimeType String
+  file     Bytes
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, taskId])
+}
