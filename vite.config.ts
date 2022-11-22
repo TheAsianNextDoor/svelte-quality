@@ -9,7 +9,6 @@ import { optimizeCss } from 'carbon-preprocess-svelte';
 import { visualizer } from 'rollup-plugin-visualizer';
 // import checker from 'vite-plugin-checker'; uncomment when support is added
 import EnvironmentPlugin from 'vite-plugin-environment';
-// import tsconfigPaths from 'vite-tsconfig-paths';
 
 import type { UserConfig } from 'vite';
 
@@ -25,7 +24,6 @@ const config: UserConfig = {
   },
   plugins: [
     sveltekit(),
-    // tsconfigPaths(),
     visualizer(),
     EnvironmentPlugin('all', { prefix: 'WEB_' }),
     process.env.NODE_ENV === 'production' && optimizeCss(), // check if works when building
